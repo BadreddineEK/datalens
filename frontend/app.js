@@ -113,19 +113,37 @@ btnAnalyze.addEventListener("click", () => {
 
 async function auditCSV(file, retryToken = null) {
   showSection("loading");
+  const loadingHint = document.getElementById("loading-hint");
+  loadingHint.textContent = "Détection des types, métriques, score qualité";
+
+  // After 8s, hint the user the server may be warming up (Render free cold start)
+  const wakeTimer = setTimeout(() => {
+    loadingHint.textContent = "Le serveur se réveille… encore quelques secondes ☕";
+  }, 8000);
 
   const token = retryToken || sessionStorage.getItem("datalens_token");
   const formData = new FormData();
   formData.append("file", file);
   if (token) formData.append("token", token);
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 75000); // 75s for cold start
+
   let res;
   try {
-    res = await fetch(`${API_BASE}/api/audit`, { method: "POST", body: formData });
-  } catch {
-    showError("Impossible de joindre le serveur", "Vérifiez votre connexion Internet et réessayez.");
+    res = await fetch(`${API_BASE}/api/audit`, { method: "POST", body: formData, signal: controller.signal });
+  } catch (err) {
+    clearTimeout(wakeTimer);
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      showError("Délai dépassé", "Le serveur met trop de temps à répondre. Réessayez dans 30 secondes.");
+    } else {
+      showError("Impossible de joindre le serveur", "Le serveur est peut-être en cours de démarrage. Patientez 30 secondes et réessayez.");
+    }
     return;
   }
+  clearTimeout(wakeTimer);
+  clearTimeout(timeoutId);
 
   if (res.status === 402) {
     showSection("upload");
