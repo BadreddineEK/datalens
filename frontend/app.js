@@ -222,7 +222,7 @@ btnSubscribe.addEventListener("click", async () => {
     data = await res.json();
   } catch {
     btnSubscribe.disabled = false;
-    btnSubscribe.textContent = "S'abonner — €19/mois";
+    btnSubscribe.textContent = "S'abonner — €7/mois";
     alert("Impossible de créer la session de paiement. Réessayez.");
     return;
   }
@@ -231,7 +231,7 @@ btnSubscribe.addEventListener("click", async () => {
     window.location.href = data.checkout_url;
   } else {
     btnSubscribe.disabled = false;
-    btnSubscribe.textContent = "S'abonner — €19/mois";
+    btnSubscribe.textContent = "S'abonner — €7/mois";
   }
 });
 
