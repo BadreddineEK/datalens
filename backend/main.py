@@ -63,7 +63,8 @@ async def audit_csv(
 
     df, encoding = parse_csv(content)
 
-    is_limited = len(df) > 1000 and not verify_access(token)
+    cell_count = len(df) * len(df.columns)
+    is_limited = cell_count > 10_000 and not verify_access(token)
     if is_limited:
         raise HTTPException(status_code=402, detail="PAYMENT_REQUIRED")
 
