@@ -1,6 +1,6 @@
 "use strict";
 
-const API_BASE = "https://api.datalens.badreddineek.com";
+const API_BASE = "https://datalens-api-lh9p.onrender.com";
 
 // ── State ──────────────────────────────────────────────────────────────────
 let selectedFile = null;
